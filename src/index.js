@@ -138,7 +138,7 @@ class GPhotos {
 
     const urlFound = cheerio.load(loginRes.body)('a').attr('href');
 
-    if (this._isChallengedUrl(urlFound)){
+    if (this._isChallengedUrl(urlFound) && !this.options.fromCli){
       return this._errorHandler('There is a challenge request, please use cli to solve it (eg: ./upload-gphotos -c -u xxx -p xxx)');
     }
     return urlFound;
