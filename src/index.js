@@ -192,10 +192,13 @@ class GPhotos {
     let challengeData = Object.assign(qs.parse($form.serialize()), {SendMethod: 'SMS'});
     const challengeRes = await this._request.post(sendTo, { form: challengeData });
 
-    if (challengeRes.statusCode !== 200) {
+    if (challengeRes.statusCode === 302) {
+    	const urlFound = cheerio.load(challengeRes.body)('a').attr('href');
+	return this._getSMSChallenge(urlFound);
+    }
+    else if (challengeRes.statusCode !== 200) {
       return this._errorHandler('Failed to get SMS for challenge');
     }
-
     this._logger.info('SMS is sent to :', $form.find('b').text());
     this._challengeRes = challengeRes;
   }
@@ -213,7 +216,7 @@ class GPhotos {
 
       const sendTo = this._getFullFormActionUrl($, $form);
       const smsFormRes = await this._request.post(sendTo, { form: smsFormData });
-      
+
       if (smsFormRes.statusCode !== 200) {
         return this._errorHandler('Failed to send SMS');
       }
